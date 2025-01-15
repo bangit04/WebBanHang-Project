@@ -37,7 +37,7 @@ public class AppConfig {
     }
 
     @Bean
-    public SendGrid sendGrid(@Value("${spring.sendGrid.apiKey}") String apiKey) {
+    public SendGrid sendGrid(@Value("${spring.sendgrid.apiKey}") String apiKey) {
         return new SendGrid(apiKey);
     }
 }
