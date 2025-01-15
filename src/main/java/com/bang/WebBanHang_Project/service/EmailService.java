@@ -67,7 +67,6 @@ public class EmailService {
 
         Email fromEmail = new Email(from,"Bang");
         Email toEmail = new Email(to);
-
         String subject = " Verification Email";
 
         String secretCode = UUID.randomUUID().toString();
