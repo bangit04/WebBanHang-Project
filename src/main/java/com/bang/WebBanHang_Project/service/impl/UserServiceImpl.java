@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
 
         // Paging
         Pageable pageable = PageRequest.of(pageNo, size, Sort.by(order));
-
         Page<UserEntity> entityPage;
 
         if (StringUtils.hasLength(keyword)) {
