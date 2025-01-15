@@ -25,7 +25,6 @@ public class EmailController {
     @GetMapping("/verify-email")
     public void emailVerification(@RequestParam String to, String name) throws IOException {
         log.info("Verifying email: {}",name);
-
         emailService.verificationEmail(to,name);
     }
 }
