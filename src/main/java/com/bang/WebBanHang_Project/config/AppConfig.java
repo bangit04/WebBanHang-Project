@@ -1,7 +1,9 @@
 package com.bang.WebBanHang_Project.config;
 
 import com.bang.WebBanHang_Project.service.UserServiceDetail;
+import com.google.gson.Gson;
 import com.sendgrid.SendGrid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -60,6 +64,21 @@ public class AppConfig {
     }
 
     @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
+                registry.addMapping("**")
+                        .allowedOrigins("http://localhost:8500")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
+                        .allowedHeaders("*") // Allowed request headers
+                        .allowCredentials(false)
+                        .maxAge(3600);
+            }
+        };
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -67,5 +86,10 @@ public class AppConfig {
     @Bean
     public SendGrid sendGrid(@Value("${spring.sendgrid.apiKey}") String apiKey) {
         return new SendGrid(apiKey);
+    }
+
+    @Bean
+    public Gson gson() {
+        return new Gson();
     }
 }

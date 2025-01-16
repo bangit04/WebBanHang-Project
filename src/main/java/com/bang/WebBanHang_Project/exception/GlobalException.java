@@ -75,6 +75,37 @@ public class GlobalException {
         return errorResponse;
     }
 
+    @ExceptionHandler(ForBiddenException.class)
+    @ResponseStatus(FORBIDDEN)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "403", description = "Access Dined",
+                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+                            examples = @ExampleObject(
+                                    name = "403 Response",
+                                    summary = "Handle exception when access forbidden",
+                                    value = """
+                                            {
+                                              "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                              "status": 403,
+                                              "path": "/api/v1/...",
+                                              "error": "Access Dined",
+                                              "message": "{data} not found"
+                                            }
+                                            """
+                            ))})
+    })
+    public ErrorResponse handleForBiddenException(ForBiddenException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(FORBIDDEN.value());
+        errorResponse.setError(FORBIDDEN.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+
+        return errorResponse;
+    }
+
+
     /**
      * Handle exception when the request not found data
      *
