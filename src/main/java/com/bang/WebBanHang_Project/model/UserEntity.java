@@ -23,11 +23,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "tbl_user")
-public class UserEntity implements UserDetails,Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+public class UserEntity extends AbstractEntity<Long> implements UserDetails,Serializable {
 
     @Column(name = "first_name", length = 255)
     private String firstName;
@@ -66,15 +62,6 @@ public class UserEntity implements UserDetails,Serializable {
     @Column(name = "status", length = 255)
     private UserStatus status;
 
-    @Column(name = "created_at", length = 255)
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
-    private Date createdAt;
-
-    @Column(name = "updated_at", length = 255)
-    @Temporal(TemporalType.TIMESTAMP)
-    @UpdateTimestamp
-    private Date updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
