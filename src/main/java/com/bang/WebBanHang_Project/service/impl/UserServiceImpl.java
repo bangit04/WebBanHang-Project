@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         // Sorting
         Sort.Order order = new Sort.Order(Sort.Direction.ASC, "id");
         if (StringUtils.hasLength(sort)) {
-            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)"); // tencot:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sort);
             if (matcher.find()) {
                 String columnName = matcher.group(1);
@@ -56,7 +56,6 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Xu ly truong hop FE muon bat dau voi page = 1
         int pageNo = 0;
         if (page > 0) {
             pageNo = page - 1;
