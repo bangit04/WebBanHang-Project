@@ -7,22 +7,23 @@ import com.bang.WebBanHang_Project.common.UserType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "tbl_user")
+@Slf4j(topic = "UserEntity")
 public class UserEntity extends AbstractEntity<Long> implements UserDetails,Serializable {
 
     @Column(name = "first_name", length = 255)
@@ -62,10 +63,20 @@ public class UserEntity extends AbstractEntity<Long> implements UserDetails,Seri
     @Column(name = "status", length = 255)
     private UserStatus status;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserHasRole> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<GroupHasUser> groups = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+
+        List<Role> roleList = roles.stream().map(UserHasRole::getRole).toList();
+
+        List<String> roleNames = roleList.stream().map(Role::getName).toList();
+        log.info("User roles: {}", roleNames);
+        return roleNames.stream().map(SimpleGrantedAuthority::new).toList();
     }
 
     @Override

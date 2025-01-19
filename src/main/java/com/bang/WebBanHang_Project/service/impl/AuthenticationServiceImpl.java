@@ -1,7 +1,11 @@
 package com.bang.WebBanHang_Project.service.impl;
 
+import com.bang.WebBanHang_Project.common.TokenType;
 import com.bang.WebBanHang_Project.controller.request.SignInRequest;
 import com.bang.WebBanHang_Project.controller.response.TokenResponse;
+import com.bang.WebBanHang_Project.exception.ForBiddenException;
+import com.bang.WebBanHang_Project.exception.InvalidDataException;
+import com.bang.WebBanHang_Project.model.UserEntity;
 import com.bang.WebBanHang_Project.repository.UserRepository;
 import com.bang.WebBanHang_Project.service.AuthenticationService;
 import com.bang.WebBanHang_Project.service.JwtService;
@@ -16,6 +20,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +38,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public TokenResponse getAccessToken(SignInRequest request) {
         log.info("Get access token");
 
+        List<String> authorities = new ArrayList<>();
         try {
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
             log.info("isAuthenticated = {}", authenticate.isAuthenticated());
             log.info("Authorities: {}", authenticate.getAuthorities().toString());
+            authorities.add(authenticate.getAuthorities().toString());
 
             SecurityContextHolder.getContext().setAuthentication(authenticate);
         } catch (BadCredentialsException | DisabledException e) {
@@ -42,13 +52,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AccessDeniedException(e.getMessage());
         }
 
-        var user = userRepository.findByUsername(request.getUsername());
-        if (user == null) {
-            throw new UsernameNotFoundException(request.getUsername());
-        }
 
-        String accessToken = jwtService.generateToken(1l,request.getUsername(), null);
-        String refreshToken = jwtService.generateRefreshToken(1l,request.getUsername(), null);
+        String accessToken = jwtService.generateAccessToken(request.getUsername(), authorities);
+        String refreshToken = jwtService.generateRefreshToken(request.getUsername(), authorities);
 
         return TokenResponse.builder()
                 .accessToken(accessToken)
@@ -57,7 +63,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public TokenResponse getRefreshToken(String request) {
-        return null;
+    public TokenResponse getRefreshToken(String refreshToken) {
+        log.info("Get refresh token");
+
+        if(!StringUtils.hasLength(refreshToken)){
+            throw new InvalidDataException("Token must be not blank");
+        }
+
+        try {
+            String userName = jwtService.extractUsername(refreshToken, TokenType.REFRESH_TOKEN);
+
+            UserEntity user = userRepository.findByUsername(userName);
+
+            List<String> authorities = new ArrayList<>();
+            user.getAuthorities().forEach(authority -> authorities.add(authority.getAuthority()));
+
+            String accessToken = jwtService.generateAccessToken(user.getUsername(),authorities);
+
+            return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        } catch (Exception e){
+            log.error("Access denied errorMessage: {}", e.getMessage());
+            throw  new ForBiddenException(e.getMessage());
+        }
     }
 }

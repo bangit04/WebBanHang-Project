@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tbl_role")
-public class Role extends AbstractEntity<Integer>{
+public class Role extends AbstractEntity<Integer> implements Serializable {
 
     @Column(name = "name")
     private String name;

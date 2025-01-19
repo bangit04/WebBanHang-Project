@@ -3,6 +3,8 @@ package com.bang.WebBanHang_Project.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Setter
 @Getter
 @Entity
@@ -10,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tbl_group")
-public class Group extends AbstractEntity<Integer> {
+public class Group extends AbstractEntity<Integer> implements Serializable {
 
     @Column(name = "name")
     private String name;

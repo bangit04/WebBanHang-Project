@@ -3,6 +3,7 @@ package com.bang.WebBanHang_Project.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tbl_permission")
-public class Permission extends AbstractEntity<Integer>{
+public class Permission extends AbstractEntity<Integer> implements Serializable {
 
     @Column(name = "name")
     private String name;
